@@ -9,13 +9,13 @@ from sqlalchemy.orm import Session
 from starlette.middleware.cors import CORSMiddleware
 from starlette.responses import JSONResponse
 
-from backend.app.auth import create_access_token, SECRET_KEY, ALGORITHM
-from backend.app.crud import get_user_by_username, get_user_by_email, create_user, authenticate_user, get_user_events, \
+from app.auth import create_access_token, SECRET_KEY, ALGORITHM
+from app.crud import get_user_by_username, get_user_by_email, create_user, authenticate_user, get_user_events, \
     analyze_cycle_patterns, get_event_statistics, create_user_event
-from backend.app.models import User
-from backend.app.schemas import UserCreate, MenstrualEventCreate
+from app.models import User
+from app.schemas import UserCreate, MenstrualEventCreate
 
-from backend.app.database import get_db
+from app.database import get_db
 
 app = FastAPI()
 templates = Jinja2Templates(directory=os.path.join("templates"))
@@ -51,11 +51,10 @@ def get_token_from_request(
         request: Request,
         token: str = Depends(get_bearer_token)
 ) -> str:
-    # print('get here')
-    # # Check if token is present in the "Authorization" header
-    # if token:
-    #     print('returing token')
-    #     return token
+    # Check if token is present in the "Authorization" header
+    if token:
+        print('returing token')
+        return token
 
     # If no token in header, check for a cookie
     token_cookie = request.cookies.get("access_token")
