@@ -6,18 +6,29 @@ from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse
 from jose import jwt, JWTError
 from sqlalchemy.orm import Session
+from starlette.middleware.cors import CORSMiddleware
 from starlette.responses import JSONResponse
 
-from app.auth import create_access_token, SECRET_KEY, ALGORITHM
-from app.crud import get_user_by_username, get_user_by_email, create_user, authenticate_user, get_user_events, \
+from backend.app.auth import create_access_token, SECRET_KEY, ALGORITHM
+from backend.app.crud import get_user_by_username, get_user_by_email, create_user, authenticate_user, get_user_events, \
     analyze_cycle_patterns, get_event_statistics, create_user_event
-from app.models import User
-from app.schemas import UserCreate, MenstrualEventCreate
+from backend.app.models import User
+from backend.app.schemas import UserCreate, MenstrualEventCreate
 
-from app.database import get_db
+from backend.app.database import get_db
 
 app = FastAPI()
 templates = Jinja2Templates(directory=os.path.join("templates"))
+
+# Add CORS middleware
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Allows all origins
+    allow_credentials=True,
+    allow_methods=["*"],  # Allows all methods
+    allow_headers=["*"],  # Allows all headers
+)
+
 
 def get_bearer_token(request: Request):
     print("Checking Authorization Header manually")

@@ -5,8 +5,7 @@ from sqlalchemy import pool
 from alembic import context
 
 # Import your Base and models
-from app.database import Base
-import app.models  # This ensures models are loaded
+from backend.app.database import Base
 
 config = context.config
 
