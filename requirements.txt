@@ -1,8 +1,10 @@
 fastapi
 uvicorn
-sqlalchemy
+sqlmodel
+aiosqlite
 psycopg2-binary
 pydantic
+pydantic-settings
 python-jose
 passlib
 python-multipart
@@ -10,3 +12,6 @@ jinja2
 alembic
 email-validator
 bcrypt==4.0.1
+pytest
+pytest-asyncio
+httpx
