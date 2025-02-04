@@ -38,13 +38,12 @@ docker-compose up --build
    ```
 
 ## Data Persistence
-- Uses SQLite with database file stored in `app/data/menstrual_tracker.db`
+- Uses SQLite with database file stored in `cycle_tracker.db`
 - Persistent volume mounts this directory in Kubernetes deployments
 
 ## Features
 - User Authentication
-- Menstrual Cycle Tracking
-- Dashboard for Cycle Management
+- Menstrual Period Tracking
 
 ## Security Considerations
 - Passwords are hashed using bcrypt

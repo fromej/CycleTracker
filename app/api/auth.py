@@ -1,4 +1,4 @@
-from datetime import timedelta, datetime
+from datetime import timedelta, datetime, UTC
 from fastapi import APIRouter, Depends, HTTPException, status, Response
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlmodel import select
@@ -59,7 +59,7 @@ async def login(
 ):
     # Authenticate user - check both email and username
     statement = select(User).where(
-        User.email == form_data.username
+        User.email.lower() == form_data.username.lower()
     )
     result = await session.execute(statement)
     user = result.scalar_one_or_none()
@@ -72,7 +72,7 @@ async def login(
         )
 
     # Update last login
-    user.last_login = datetime.utcnow()
+    user.last_login = datetime.now(UTC)
     session.add(user)
     await session.commit()
 
