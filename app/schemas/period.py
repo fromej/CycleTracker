@@ -45,3 +45,8 @@ class PeriodResponse(PeriodCreate):
     symptoms: List[SymptomResponse] = []
 
     model_config = ConfigDict(from_attributes=True)
+
+
+class DateIntensityCount(BaseModel):
+    date: date
+    count: int

@@ -7,6 +7,7 @@ class UserBase(BaseModel):
     email: EmailStr
     first_name: str
     last_name: str
+    is_superuser: bool = False
 
 
 class UserCreate(UserBase):
@@ -33,9 +34,17 @@ class UserUpdate(BaseModel):
         from_attributes = True
 
 
-class PasswordChange(BaseModel):
-    current_password: str
+class PasswordChangeAdmin(BaseModel):
     new_password: constr(min_length=8, max_length=64)
+
+
+class PasswordChange(PasswordChangeAdmin):
+    current_password: str
+
+
+class UserLogin(BaseModel):
+    username: EmailStr
+    password: str
 
 
 class Token(BaseModel):

@@ -8,7 +8,7 @@ from starlette.exceptions import HTTPException
 from app.api.deps import get_current_user, get_current_user_admin
 from app.core.database import get_async_session
 from app.models.user import UserRead, User
-from app.schemas.user import UserCreate, UserUpdate, PasswordChange
+from app.schemas.user import UserCreate, UserUpdate, PasswordChange, PasswordChangeAdmin
 from app.services.db_services import PaginatedResponse, PaginationParams
 from app.services.user import UserService
 
@@ -19,7 +19,7 @@ def get_user_service(db: AsyncSession = Depends(get_async_session)) -> UserServi
     return UserService(db)
 
 
-@router.post("/", response_model=UserRead, status_code=status.HTTP_201_CREATED)
+@router.post("", response_model=UserRead, status_code=status.HTTP_201_CREATED)
 async def create_user(
         user_create: UserCreate,
         user_service: UserService = Depends(get_user_service),
@@ -78,7 +78,7 @@ async def read_user(
     return db_user
 
 
-@router.get("/", response_model=PaginatedResponse[UserRead])
+@router.get("", response_model=PaginatedResponse[UserRead])
 async def read_users(
         pagination: PaginationParams = Depends(),
         user_service: UserService = Depends(get_user_service),
@@ -100,11 +100,11 @@ async def update_user(
 @router.post("/{user_id}/change-password", status_code=status.HTTP_200_OK)
 async def change_password(
         user_id: UUID,
-        password_change: PasswordChange,
+        password_change: PasswordChangeAdmin,
         user_service: UserService = Depends(get_user_service),
         current_user: User = Depends(get_current_user_admin)
 ):
-    await user_service.change_password(user_id, password_change)
+    await user_service.change_password_admin(user_id, password_change)
     return {"message": "Password changed successfully"}
 
 

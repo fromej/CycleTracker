@@ -2,13 +2,14 @@ from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException
 from sqlmodel.ext.asyncio.session import AsyncSession
-from typing import Optional
+from starlette import status
+from typing import Optional, List
 
 from app.api.deps import get_current_user
 from app.core.database import get_async_session
 from app.models.user import User
 from app.models.period import Period
-from app.schemas.period import PeriodUpdate, PeriodResponse, PeriodCreate
+from app.schemas.period import PeriodUpdate, PeriodResponse, PeriodCreate, DateIntensityCount
 from app.services.db_services import PaginationParams, PaginatedResponse
 from app.services.period import PeriodService
 
@@ -19,7 +20,7 @@ def get_period_service(db: AsyncSession = Depends(get_async_session)) -> PeriodS
     return PeriodService(db, Period)
 
 
-@period_router.post("/", response_model=PeriodResponse)
+@period_router.post("", response_model=PeriodResponse, status_code=status.HTTP_201_CREATED)
 async def create_period(
         period: PeriodCreate,
         period_service: PeriodService = Depends(get_period_service),
@@ -38,7 +39,7 @@ async def create_period(
         raise HTTPException(status_code=400, detail=str(e))
 
 
-@period_router.get("/", response_model=PaginatedResponse[PeriodResponse])
+@period_router.get("", response_model=PaginatedResponse[PeriodResponse])
 async def list_periods(
         pagination: PaginationParams = Depends(),
         period_service: PeriodService = Depends(get_period_service),
@@ -48,6 +49,20 @@ async def list_periods(
     List periods for the current user with pagination.
     """
     return await period_service.get_user_periods(current_user.id, pagination)
+
+
+@period_router.get("/intensity-counts", response_model=List[DateIntensityCount])
+async def get_period_intensity_counts(
+    period_service: PeriodService = Depends(get_period_service),
+    current_user: User = Depends(get_current_user)
+) -> List[DateIntensityCount]:
+    """
+    Get a list of dates and their corresponding flow intensity counts for the last year.
+    Returns a list of objects containing:
+    - date: The date
+    - count: Integer representing flow intensity (0 for low, 1 for medium, 2 for high)
+    """
+    return await period_service.get_period_intensity_counts(current_user.id)
 
 
 @period_router.get("/recent", response_model=Optional[PeriodResponse])
@@ -104,7 +119,7 @@ async def update_period(
         raise HTTPException(status_code=400, detail=str(e))
 
 
-@period_router.delete("/{period_id}", response_model=dict)
+@period_router.delete("/{period_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_period(
         period_id: UUID,
         period_service: PeriodService = Depends(get_period_service),
@@ -123,5 +138,3 @@ async def delete_period(
 
     if not deleted:
         raise HTTPException(status_code=400, detail="Could not delete period")
-
-    return {"detail": "Period successfully deleted"}

@@ -134,7 +134,7 @@ class BaseCRUDService:
         """
         Delete a record.
         """
-        obj = await self.get(self.db, object_id)
+        obj = await self.get(object_id)
         if obj:
             await self.db.delete(obj)
             await self.db.commit()

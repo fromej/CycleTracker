@@ -8,7 +8,7 @@ settings = get_settings()
 
 # Database URL handling
 DATABASE_URL = settings.database_url
-ASYNC_DATABASE_URL = DATABASE_URL.replace("sqlite:", "sqlite+aiosqlite:")
+ASYNC_DATABASE_URL = settings.async_database_url
 
 # Synchronous engine and session maker
 sync_engine = create_engine(DATABASE_URL, echo=True)

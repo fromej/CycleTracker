@@ -33,7 +33,8 @@ class UserService():
             email=user_create.email,
             first_name=user_create.first_name,
             last_name=user_create.last_name,
-            hashed_password=hashed_password
+            hashed_password=hashed_password,
+            is_superuser=user_create.is_superuser
         )
 
         self.db.add(db_user)
@@ -49,7 +50,7 @@ class UserService():
                 detail="User not found"
             )
 
-        update_data = user_update.dict(exclude_unset=True)
+        update_data = user_update.model_dump(exclude_unset=True)
 
         for field, value in update_data.items():
             setattr(db_user, field, value)
@@ -73,6 +74,22 @@ class UserService():
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="Incorrect password"
+            )
+
+        # Update password
+        db_user.hashed_password = pwd_context.hash(password_change.new_password)
+        db_user.updated_at = datetime.now()
+
+        self.db.add(db_user)
+        await self.db.commit()
+        return True
+
+    async def change_password_admin(self, user_id: UUID, password_change: PasswordChange) -> bool:
+        db_user = await self.get_by_id(user_id)
+        if not db_user:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="User not found"
             )
 
         # Update password
